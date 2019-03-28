@@ -1,0 +1,112 @@
+
+
+各模块的基本功能、概念、调用流程
+
+部署架构
+
+
+
+
+网络-东西流量
+https://docs.openstack.org/neutron/pike/admin/deploy-lb-provider.html
+
+
+添加storage backend
+Configure an NFS storage back end
+https://docs.openstack.org/cinder/rocky/admin/blockstorage-nfs-backend.html
+
+Configure multiple-storage back ends
+https://docs.openstack.org/cinder/latest/admin/blockstorage-multi-backend.html
+
+
+检查健康状态
+/etc/systemd/system
+service devstack@c-vol status
+
+添加计算节点
+https://docs.openstack.org/nova/queens/install/compute-install.html
+
+
+重启各服务
+Restart an OpenStack service
+https://docs.openstack.org/fuel-docs/newton/userdocs/fuel-user-guide/troubleshooting/restart-service.html
+service nova-compute restart
+
+systemctl restart networking.service
+
+/etc/systemd/system/multi-user.target.wants
+
+查看计算服务状态 nova
+openstack compute service list
+
+查看网络服务状态 neutron
+openstack network agent list
+
+查看存储服务状态 cinder
+openstack volume service list
+
+
+
+创建instance
+openstack server create --flavor m1.tiny --image cirros \
+  --nic net-id=PROVIDER_NET_ID --security-group default \
+  --key-name mykey provider-instance
+
+  启动nova-compute 服务
+/usr/bin/python /usr/local/bin/nova-compute --config-file /etc/nova/nova-cpu.conf
+
+openstack compute service list
+openstack network list
+openstack network agent list
+openstack service show cinder
+
+Neutron – A Flat Network in a Single-Node, Single-NIC OpenStack environment (Kilo on Ubuntu 14.0.4)
+https://desertislandit.wordpress.com/2016/02/08/neutron-a-flat-network-in-a-single-node-single-nic-openstack-environment-kilo-on-ubuntu-14-0-4/
+
+
+如何配置使用vlan/vxlan/gre
+
+devstack default networking
+https://docs.openstack.org/devstack/latest/networking.html
+
+Manually routing traffic from br-ex to internet: devstack
+https://rahulait.wordpress.com/2016/06/27/manually-routing-traffic-from-br-ex-to-internet-devstack/
+
+How to Configure OpenStack Networking to Enable Access to VM Instances
+https://www.itzgeek.com/how-tos/linux/centos-how-tos/configure-openstack-networking-enable-access-vm-instances.html
+
+How to Configure OpenStack Network to Enable Access to OpenStack Instances
+https://www.tecmint.com/openstack-networking-guide/
+
+CHAPTER 7. CONNECT AN INSTANCE TO THE PHYSICAL NETWORK
+https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/10/html/networking_guide/sec-connect-instance
+
+
+Keystone V3 API 调用
+https://www.ibm.com/developerworks/cn/cloud/library/1506_yuwz_keystonev3/index.html
+
+添加eth1
+brctl addbr eth1
+
+增加domain
+OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT = True
+OPENSTACK_KEYSTONE_DOMAIN_DROPDOWN = True
+OPENSTACK_KEYSTONE_DOMAIN_CHOICES = (
+  ('Default', 'Default'),('corpaaa','corpA'),
+)
+
+
+指定instance 运行的host
+openstack server create --image IMAGE --flavor m1.tiny \
+  --key-name KEY --availability-zone ZONE:HOST:NODE \
+  --nic net-id=UUID SERVER
+
+
+搁置实例 shelve
+OpenStack Image Shelving
+https://blog.codybunch.com/2017/09/08/OpenStack-Image-Shelving/
+
+openstack security group rule create --proto icmp --dst-port 0 default
+openstack security group rule create --proto tcp --dst-port 22 default
+
+journalctl --unit devstack@*
